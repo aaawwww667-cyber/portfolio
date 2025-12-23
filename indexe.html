@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haneen Mohamed | The Data Visionary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&family=JetBrains+Mono:wght@300;500&display=swap');
+        
+        :root {
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            --accent: #f472b6;
+            --bg: #020617;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            cursor: none;
+            scroll-behavior: smooth;
+        }
+
+        #bg-canvas { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.3; }
+
+        #cursor { width: 8px; height: 8px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; transition: transform 0.1s; }
+        #cursor-follower { width: 40px; height: 40px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1); }
+
+        .glass { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .gradient-text { background: linear-gradient(135deg, #fff 30%, var(--primary) 70%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .img-container { 
+            position: relative; 
+            border-radius: 3rem; 
+            overflow: hidden; 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #0f172a;
+        }
+        
+        .scanner-line { 
+            position: absolute; 
+            width: 100%; 
+            height: 4px; 
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            box-shadow: 0 0 30px var(--primary); 
+            z-index: 10; 
+            animation: scan 4s ease-in-out infinite; 
+        }
+        @keyframes scan { 0%, 100% { top: 0%; } 50% { top: 100%; } }
+
+        .btn-premium {
+            padding: 1.25rem 2.5rem; border-radius: 1.5rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
+            transition: 0.5s; position: relative; overflow: hidden; z-index: 1; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.03); font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-premium:hover { transform: scale(1.05) translateY(-5px); background: #fff; color: #000; border-color: #fff; }
+        
+        .upload-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; transition: 0.3s; cursor: pointer; z-index: 20;
+        }
+        .img-container:hover .upload-overlay { opacity: 1; }
+
+        .service-card { transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .service-card:hover { transform: translateY(-10px) scale(1.02); background: rgba(255,255,255,0.05); }
+
+        .social-link {
+            width: 48px; height: 48px; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        .social-link:hover { transform: translateY(-5px) rotate(8deg); border-color: var(--primary); color: var(--primary); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2); }
+        
+        .about-card { border-right: 1px solid rgba(56, 189, 248, 0.1); }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-[100] px-8 py-6 flex justify-between items-center glass border-b border-white/5">
+        <div class="flex items-center gap-4 group cursor-pointer">
+            <div class="relative">
+                <div class="w-12 h-12 bg-white rounded-2xl rotate-12 group-hover:rotate-0 transition-all duration-500 flex items-center justify-center">
+                    <span class="text-black font-black text-2xl -rotate-12 group-hover:rotate-0 transition-all">H</span>
+                </div>
+                <div class="absolute inset-0 bg-sky-500 rounded-2xl blur-lg opacity-0 group-hover:opacity-40 transition-all"></div>
+            </div>
+            <div>
+                <p class="font-extrabold text-sm uppercase tracking-widest">Haneen Mohamed</p>
+                <p class="text-[9px] mono text-sky-400 uppercase tracking-[0.4em]">Intelligence Architect</p>
+            </div>
+        </div>
+        
+        <div class="hidden lg:flex gap-12 text-[11px] font-bold uppercase tracking-[0.4em] text-white/30">
+            <a href="#home" class="hover:text-white transition-all">Home</a>
+            <a href="#about" class="hover:text-white transition-all">About</a>
+            <a href="#stack" class="hover:text-white transition-all">Stack</a>
+            <a href="#projects" class="hover:text-white transition-all">Cases</a>
+        </div>
+
+        <div class="flex gap-3">
+             <a href="https://www.linkedin.com/in/haneen-abdelmoniem" target="_blank" class="social-link"><i class="fab fa-linkedin-in text-sm"></i></a>
+             <a href="https://www.instagram.com/haneen.mohamed" target="_blank" class="social-link"><i class="fab fa-instagram text-sm"></i></a>
+             <a href="https://wa.me/201000000000" target="_blank" class="social-link"><i class="fab fa-whatsapp text-sm"></i></a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen pt-40 pb-20 px-8 flex items-center relative overflow-hidden">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center relative z-10">
+            <div data-aos="fade-right">
+                <div class="flex items-center gap-4 mb-8">
+                    <span class="h-[1px] w-12 bg-sky-500"></span>
+                    <span class="mono text-sky-400 text-[10px] font-bold tracking-[0.5em] uppercase">Senior Data Strategy Analyst</span>
+                </div>
+                
+                <h1 class="text-7xl md:text-9xl font-black mb-10 leading-[0.85] tracking-tighter uppercase">
+                    DATA <br> <span class="gradient-text">ANALYSIS.</span>
+                </h1>
+
+                <p class="text-xl md:text-2xl text-slate-400 font-light mb-12 max-w-xl leading-relaxed">
+                    I translate complex numbers into <span class="text-white font-bold" id="typewriter"></span>. Expert in architecting data-driven growth strategies.
+                </p>
+
+                <div class="flex flex-wrap gap-6 mb-20">
+                    <button onclick="document.getElementById('fileInput').click()" class="btn-premium">Upload My Image</button>
+                    <a href="#contact" class="flex items-center gap-3 text-xs font-black uppercase tracking-widest hover:text-sky-400 transition-all">
+                        Let's Talk <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-3 gap-12 pt-12 border-t border-white/5">
+                    <div class="stat-card">
+                        <span class="text-4xl font-black block mb-2">04+</span>
+                        <span class="mono text-[9px] uppercase tracking-widest text-slate-500">Years Matrix</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="text-4xl font-black block mb-2">150+</span>
+                        <span class="mono text-[9px] uppercase tracking-widest text-slate-500">Dashboards</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="text-4xl font-black block mb-2">99%</span>
+                        <span class="mono text-[9px] uppercase tracking-widest text-slate-500">Data Integrity</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative group" data-aos="zoom-in-up" data-aos-duration="1500">
+                <input type="file" id="fileInput" class="hidden" accept="image/*">
+                <div class="img-container w-full aspect-[4/5] shadow-2xl shadow-sky-900/20" id="imageWrapper">
+                    <div class="scanner-line"></div>
+                    <div class="upload-overlay" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-camera text-4xl mb-4"></i>
+                        <span class="text-xs font-bold uppercase tracking-widest">Update Profile Photo</span>
+                    </div>
+                    <img id="profileImg" 
+                         src="haneen.jpeg" 
+                         onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop'"
+                         class="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110">
+                    <div class="absolute bottom-10 right-10 glass p-6 rounded-3xl border-sky-500/20">
+                        <p class="text-[9px] mono text-sky-400 mb-2 uppercase tracking-widest">Status</p>
+                        <p class="text-lg font-black uppercase italic">Ready for Impact</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Me Section -->
+    <section id="about" class="py-32 px-8 bg-white/[0.01]">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-20 items-center">
+                <div data-aos="fade-up">
+                    <h2 class="text-5xl font-black uppercase mb-10 tracking-tighter">The Person <span class="text-sky-500">Behind</span> The Analysis</h2>
+                    <div class="space-y-6 text-slate-400 leading-relaxed text-lg">
+                        <p>
+                            I am <span class="text-white font-bold">Haneen Mohamed Abdelmoniem</span>, a Strategic Data Analyst dedicated to turning raw, chaotic data into clear, actionable business intelligence. My journey started with a fascination for patterns and evolved into a career of building data systems that drive revenue.
+                        </p>
+                        <p>
+                            With over 4 years of experience, I specialize in the intersection of business logic and technical execution. Whether it's optimizing supply chains in <span class="text-sky-400">Excel</span>, building executive-level dashboards in <span class="text-yellow-400">Power BI</span>, or architecting relational databases in <span class="text-blue-400">SQL</span>, my focus is always on the ROI.
+                        </p>
+                        <p>
+                            I don't just provide charts; I provide <span class="italic text-white underline decoration-sky-500">answers</span>. I help stakeholders see the "Why" behind the "What".
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-8 mt-12">
+                        <div class="about-card p-4">
+                            <h4 class="font-bold text-white uppercase text-sm mb-2 italic tracking-widest">My Philosophy</h4>
+                            <p class="text-xs text-slate-500">Data is silent until you ask the right questions.</p>
+                        </div>
+                        <div class="about-card p-4">
+                            <h4 class="font-bold text-white uppercase text-sm mb-2 italic tracking-widest">My Mission</h4>
+                            <p class="text-xs text-slate-500">Empowering decisions through precision analytics.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4" data-aos="fade-left">
+                    <div class="glass p-8 rounded-[2rem] space-y-4">
+                        <i class="fas fa-graduation-cap text-sky-500 text-2xl"></i>
+                        <h4 class="font-bold text-white uppercase text-xs">Education</h4>
+                        <p class="text-[11px] text-slate-500 tracking-wide">BSc in Business Information Systems // Data Science Track</p>
+                    </div>
+                    <div class="glass p-8 rounded-[2rem] space-y-4 translate-y-8">
+                        <i class="fas fa-certificate text-accent text-2xl"></i>
+                        <h4 class="font-bold text-white uppercase text-xs">Certification</h4>
+                        <p class="text-[11px] text-slate-500 tracking-wide">Microsoft Certified: Power BI Data Analyst Associate</p>
+                    </div>
+                    <div class="glass p-8 rounded-[2rem] space-y-4">
+                        <i class="fas fa-language text-purple-500 text-2xl"></i>
+                        <h4 class="font-bold text-white uppercase text-xs">Languages</h4>
+                        <p class="text-[11px] text-slate-500 tracking-wide">Arabic (Native)<br>English (Professional)</p>
+                    </div>
+                    <div class="glass p-8 rounded-[2rem] space-y-4 translate-y-8">
+                        <i class="fas fa-award text-yellow-500 text-2xl"></i>
+                        <h4 class="font-bold text-white uppercase text-xs">Expertise</h4>
+                        <p class="text-[11px] text-slate-500 tracking-wide">Retail Analytics<br>Supply Chain Optimization</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Arsenal -->
+    <section id="stack" class="py-32 px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-24">
+                <p class="mono text-sky-500 text-[10px] font-bold tracking-[0.5em] uppercase mb-4">The Toolkit</p>
+                <h2 class="text-5xl font-black uppercase tracking-tighter">My Tech Arsenal</h2>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="glass p-10 rounded-[2.5rem] service-card" data-tilt>
+                    <div class="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mb-8"><i class="fas fa-file-excel text-green-500 text-3xl"></i></div>
+                    <h3 class="text-xl font-extrabold mb-4 uppercase">Advanced Excel</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Automation, VBA, Power Query, and complex Pivot-Table logic.</p>
+                </div>
+                <div class="glass p-10 rounded-[2.5rem] service-card" data-tilt>
+                    <div class="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mb-8"><i class="fas fa-chart-line text-yellow-500 text-3xl"></i></div>
+                    <h3 class="text-xl font-extrabold mb-4 uppercase">Power BI</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Interactive executive dashboards and predictive visual storytelling.</p>
+                </div>
+                <div class="glass p-10 rounded-[2.5rem] service-card" data-tilt>
+                    <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-8"><i class="fas fa-database text-blue-500 text-3xl"></i></div>
+                    <h3 class="text-xl font-extrabold mb-4 uppercase">SQL Forge</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Complex joins, database optimization, and high-speed data cleaning.</p>
+                </div>
+                <div class="glass p-10 rounded-[2.5rem] service-card" data-tilt>
+                    <div class="w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center mb-8"><i class="fab fa-python text-sky-400 text-3xl"></i></div>
+                    <h3 class="text-xl font-extrabold mb-4 uppercase">Python DS</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Statistical analysis using Pandas, Numpy, and custom ETL pipelines.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="py-32 px-8">
+        <div class="max-w-7xl mx-auto">
+             <div class="flex justify-between items-end mb-20" data-aos="fade-up">
+                <div>
+                    <h2 class="text-5xl font-black uppercase tracking-tighter">Case Studies</h2>
+                    <p class="text-slate-500 mt-4 tracking-widest uppercase text-[10px]">Real Problems // Real Solutions</p>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-10">
+                <div class="group relative overflow-hidden rounded-[3rem] glass border border-white/10" data-aos="fade-up">
+                    <img src="https://images.unsplash.com/photo-1551288049-bbbda536639a?q=80&w=2070&auto=format&fit=crop" class="w-full h-96 object-cover opacity-20 group-hover:scale-110 group-hover:opacity-40 transition-all duration-700">
+                    <div class="absolute inset-0 p-12 flex flex-col justify-end">
+                        <div class="mono text-sky-400 text-[10px] mb-4 uppercase tracking-[0.4em]">Sales Performance</div>
+                        <h3 class="text-3xl font-black mb-4">Retail Revenue Optimization</h3>
+                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">Recovered 15% missed revenue by identifying inventory bottlenecks using Power BI and SQL.</p>
+                        <div class="flex gap-2">
+                            <span class="px-4 py-1 glass rounded-full text-[9px] font-bold uppercase tracking-widest text-white/50">Power BI</span>
+                            <span class="px-4 py-1 glass rounded-full text-[9px] font-bold uppercase tracking-widest text-white/50">SQL</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="group relative overflow-hidden rounded-[3rem] glass border border-white/10" data-aos="fade-up" data-aos-delay="200">
+                    <img src="https://images.unsplash.com/photo-1543286386-713bdd548da4?q=80&w=2070&auto=format&fit=crop" class="w-full h-96 object-cover opacity-20 group-hover:scale-110 group-hover:opacity-40 transition-all duration-700">
+                    <div class="absolute inset-0 p-12 flex flex-col justify-end">
+                        <div class="mono text-purple-400 text-[10px] mb-4 uppercase tracking-[0.4em]">Logistics</div>
+                        <h3 class="text-3xl font-black mb-4">Supply Chain Intelligence</h3>
+                        <p class="text-slate-400 text-sm mb-6 leading-relaxed">Reduced shipment delay by 22% through an automated Excel/VBA forecasting model.</p>
+                        <div class="flex gap-2">
+                            <span class="px-4 py-1 glass rounded-full text-[9px] font-bold uppercase tracking-widest text-white/50">Excel</span>
+                            <span class="px-4 py-1 glass rounded-full text-[9px] font-bold uppercase tracking-widest text-white/50">DAX</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="pt-40 pb-20 px-8 relative overflow-hidden glass border-t border-white/5">
+        <div class="max-w-7xl mx-auto relative z-10 text-center lg:text-left">
+            <div class="grid lg:grid-cols-2 gap-20 items-end mb-24">
+                <div>
+                    <h2 class="text-6xl md:text-8xl font-black uppercase tracking-tighter mb-10 leading-none">Let's <br> <span class="gradient-text text-sky-500">Solve.</span></h2>
+                    <p class="text-slate-500 max-w-md mb-10 mx-auto lg:mx-0">I am currently available for freelance projects and high-impact full-time roles.</p>
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-4">
+                        <a href="https://wa.me/201000000000" target="_blank" class="btn-premium px-12">WhatsApp Me</a>
+                        <a href="https://www.linkedin.com/in/haneen-abdelmoniem" target="_blank" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/haneen.mohamed" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="text-center lg:text-right flex flex-col items-center lg:items-end gap-6">
+                    <p class="mono text-sky-500 text-[10px] font-bold tracking-[0.5em] uppercase">Cairo, Egypt // Remote</p>
+                    <a href="tel:+201000000000" class="text-4xl font-black hover:text-sky-400 transition-all tracking-tighter">+20 1XX XXX XXXX</a>
+                    <p class="text-white/20 text-xs font-bold tracking-widest">HANEEN.MOHAMED.DATA@GMAIL.COM</p>
+                </div>
+            </div>
+            <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="mono text-[9px] text-white/20 uppercase tracking-[0.5em]">Haneen Mohamed Abdelmoniem // © 2024</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1200, once: true });
+        new Typed('#typewriter', {
+            strings: ['Strategic Growth', 'Market Clarity', 'Operational Power', 'Predictive Insights'],
+            typeSpeed: 60, backSpeed: 40, loop: true
+        });
+
+        // Background
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function initParticles() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            particles = [];
+            for(let i=0; i<80; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                    size: Math.random() * 1.5, speedX: Math.random() * 0.4 - 0.2, speedY: Math.random() * 0.4 - 0.2
+                });
+            }
+        }
+        function animateParticles() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.5)';
+            particles.forEach(p => {
+                p.x += p.speedX; p.y += p.speedY;
+                if(p.x > canvas.width) p.x = 0; if(p.y > canvas.height) p.y = 0;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        initParticles(); animateParticles();
+        window.addEventListener('resize', initParticles);
+
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+            follower.style.transform = `translate3d(${e.clientX - 20}px, ${e.clientY - 20}px, 0)`;
+        });
+
+        const fileInput = document.getElementById('fileInput');
+        const profileImg = document.getElementById('profileImg');
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) { profileImg.src = event.target.result; };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        VanillaTilt.init(document.querySelectorAll(".service-card"), { max: 10, speed: 600, glare: true, "max-glare": 0.2 });
+    </script>
+</body>
+</html>
